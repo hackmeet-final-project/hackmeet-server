@@ -3,18 +3,40 @@ const express = require('express')
 const router = require('./routers/index')
 const app = express()
 const server = require('http').Server(app)
-
-const io = require('socket.io')(server, {
-    allowEIO3: true,
-    cors: {
-        origin: ['http://localhost:5173']
-    }
-})
+const PORT = process.argv.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.use(router)
+const io = require('socket.io')(server, {
+    cors: {
+        origin: ['http://localhost:5173']
+    }
+})
 
-const PORT = process.argv.PORT || 3000
+const rooms = []
+let totalUserOnRoom = 0
+
+io.on("connection", (socket) => {
+    socket.on("join-room", (username, peerId) => {
+        if(rooms.length === 0) {
+            rooms.push(username)
+            socket.join(rooms[0])
+        } else {
+            socket.join(rooms[0])
+        }
+        socket.nsp.to(rooms[0]).emit("assign-room", rooms[0], peerId)
+        
+        totalUserOnRoom++
+        if(totalUserOnRoom === 2) {
+            totalUserOnRoom = 0
+            rooms.pop()
+        }
+    })
+
+})
+
+server.listen(PORT, () => {
+    console.log(`listening on ${PORT}`)
+})
