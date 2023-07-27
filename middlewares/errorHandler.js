@@ -12,16 +12,13 @@ const errorHandler = (error, req, res, next) => {
         case "SequelizeUniqueConstraintError":
         case "SequelizeValidationError":
             status = 400
-            message = error[0].errors.message
+            message = error.errors[0].message
             break
         case "FAILEDLOGIN":
-            status = 401
-            message = "Invalid email/password"
-            break
         case "INVALIDTOKEN":
         case "JsonWebTokenError":
-            status = 403
-            message = "Unauthorized"
+            status = 401
+            message = "Invalid email/password"
             break
     }
 

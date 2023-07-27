@@ -4,14 +4,8 @@ const {User} = require("../models")
 
 class UserController {
     static async registerUser(req, res, next) {
+        const {email, password} = req.body
         try {
-            const {email, password} = req.body
-            if(!email) {
-                throw {name: "BADREQUEST", message: "Email is required"}
-            }
-            if(!password) {
-                throw {name: "BADREQUEST", message: "Password is required"}
-            }
             const newUser = await User.create({email, password})
             res.status(201).json(newUser)
         } catch (error) {
@@ -20,8 +14,8 @@ class UserController {
     }
 
     static async login(req, res, next) {
+        const {email, password} = req.body
         try {
-            const {email, password} = req.body
             if(!email) {
                 throw {name: "BADREQUEST", message: "Email is required"}
             }
@@ -33,11 +27,7 @@ class UserController {
                     email
                 }
             })
-            let isMatch = comparePassword(password, user.password)
-            if(!isMatch) {
-                throw {name: "FAILEDLOGIN"}
-            }
-            if(!user) {
+            if(!user || !comparePassword(password, user.password)) {
                 throw {name: "FAILEDLOGIN"}
             }
             let access_token = signToken({id: user.id})
