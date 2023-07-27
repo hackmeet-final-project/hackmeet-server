@@ -5,8 +5,8 @@ function signToken(obj) {
     return jwt.sign(obj, JWT_SECRET)
 }
 
-function verifyToken(obj, accessToken) {
-    return jwt.verify(obj, accessToken)
+function verifyToken(access_token) {
+    return jwt.verify(access_token, JWT_SECRET)
 }
 
 module.exports = { signToken, verifyToken }
