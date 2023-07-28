@@ -1,5 +1,6 @@
 const cors = require('cors')
 const express = require('express')
+const redis = require('./config/redis')
 const router = require('./routers/index')
 const errorHandler = require('./middlewares/errorHandler')
 const app = express()
@@ -23,6 +24,7 @@ const rooms = []
 let totalUserOnRoom = 0
 
 io.on("connection", (socket) => {
+
     socket.on("join-room", (username, peerId) => {
         if(rooms.length === 0) {
             rooms.push(username)
@@ -30,6 +32,7 @@ io.on("connection", (socket) => {
         } else {
             socket.join(rooms[0])
         }
+        
         socket.nsp.to(rooms[0]).emit("assign-room", rooms[0], peerId)
         
         totalUserOnRoom++
@@ -37,6 +40,10 @@ io.on("connection", (socket) => {
             totalUserOnRoom = 0
             rooms.pop()
         }
+    })
+
+    socket.on("start-timer", room => {
+        socket.nsp.to(room).emit("timer-ready")
     })
 
 })
