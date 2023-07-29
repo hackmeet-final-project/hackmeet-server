@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
         }
 
         console.log(`user ${username} join ke room`, rooms[0])
-
+ 
         socket.nsp.to(rooms[0]).emit("assign-room", rooms[0])
 
         if(peerId !== rooms[0]) {
@@ -51,6 +51,11 @@ io.on("connection", (socket) => {
     socket.on("start-timer", room => {
         console.log(`timer jalan di room`, room)
         socket.nsp.to(room).emit("timer-ready")
+    })
+
+    socket.on("send-message", (message, room) => {
+        console.log(room)
+        socket.to(room).emit("receive-message", message)
     })
 })
 
