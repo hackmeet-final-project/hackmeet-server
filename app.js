@@ -24,16 +24,22 @@ const rooms = []
 let totalUserOnRoom = 0
 
 io.on("connection", (socket) => {
-
+    console.log(`user login`)
     socket.on("join-room", (username, peerId) => {
         if(rooms.length === 0) {
-            rooms.push(username)
+            rooms.push(peerId)
             socket.join(rooms[0])
         } else {
             socket.join(rooms[0])
         }
-        
-        socket.nsp.to(rooms[0]).emit("assign-room", rooms[0], peerId)
+
+        console.log(`user ${username} join ke room`, rooms[0])
+
+        socket.nsp.to(rooms[0]).emit("assign-room", rooms[0])
+
+        if(peerId !== rooms[0]) {
+            socket.nsp.to(rooms[0]).emit("call-user", rooms[0])
+        }
         
         totalUserOnRoom++
         if(totalUserOnRoom === 2) {
@@ -43,9 +49,9 @@ io.on("connection", (socket) => {
     })
 
     socket.on("start-timer", room => {
+        console.log(`timer jalan di room`, room)
         socket.nsp.to(room).emit("timer-ready")
     })
-
 })
 
 server.listen(PORT, () => {
