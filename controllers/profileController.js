@@ -44,7 +44,7 @@ class ProfileController {
                     break;
 
                 default:
-                    throw { name: "BADREQUEST", message: "Input is required" };
+                    throw { name: "BADREQUEST", message: "Invalid input" };
             }
 
             res.json({

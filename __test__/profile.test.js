@@ -30,10 +30,10 @@ afterAll(async () => {
 describe('POST /profiles', () => {
     it('create profile users and return 201', async () => {
         const profile = {
-            firstName: "ha", 
-            lastName: "", 
-            hacktivId: "1ushqsjn", 
-            role: "Student", 
+            firstName: "ha",
+            lastName: "",
+            hacktivId: "1ushqsjn",
+            role: "Student",
             UserId: 1
         };
         const response = await request(app).post('/profiles').send(profile).set('access_token', token);
@@ -45,10 +45,10 @@ describe('POST /profiles', () => {
 
     it('create profile users with invalid token and return 401', async () => {
         const profile = {
-            firstName: "ha", 
-            lastName: "", 
-            hacktivId: "1ushqsjn", 
-            role: "Student", 
+            firstName: "ha",
+            lastName: "",
+            hacktivId: "1ushqsjn",
+            role: "Student",
             UserId: 1
         };
         const response = await request(app).post('/profiles').send(profile).set('access_token', invalidToken);
@@ -62,4 +62,65 @@ describe('POST /profiles', () => {
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
     });
-})
+});
+
+describe("PATCH /profiles", () => {
+    const body = {
+        input: "+20"
+    }
+
+    it("should update mmr profile if input is '+20' and return 200", async () => {
+        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "MMR updated");
+    });
+
+    it("should update mmr profile if input is '-10' and return 200", async () => {
+        body.input = "-10";
+        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "MMR updated");
+    });
+
+    it("should update mmr profile if input is '-20' and return 200", async () => {
+        body.input = "-20";
+        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "MMR updated");
+    });
+
+    it("should failed if input is empty and return 401", async () => {
+        body.input = "";
+        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        expect(response.status).toBe(401);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "Invalid input");
+    });
+
+    it("should failed if input is null and return 401", async () => {
+        delete body.input;
+        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        expect(response.status).toBe(401);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "Invalid input");
+    });
+
+    it("should failed if input is wrong input and return 401", async () => {
+        body.input = "wrong input";
+        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        expect(response.status).toBe(401);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "Invalid input");
+    });
+
+    it("should failed if input is wrong input and return 401", async () => {
+        body.input = "wrong input";
+        const response = await request(app).patch("/profiles").send(body).set("access_token", invalidToken);
+        expect(response.status).toBe(401);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "Invalid email/password");
+    });
+});
