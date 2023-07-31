@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../app");
+const {server} = require("../app");
 const { sequelize, User, Question } = require("../models");
 const { queryInterface } = sequelize;
 const { signToken } = require("../helpers/jwt");
@@ -29,7 +29,7 @@ afterAll(async () => {
 
 describe("GET /questions", () => {
   it("should be get all the questions", async () => {
-    const response = await request(app)
+    const response = await request(server)
       .get("/questions")
       .set("access_token", token);
     expect(response.status).toBe(200);

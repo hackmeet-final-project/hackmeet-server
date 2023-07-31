@@ -67,6 +67,19 @@ class ProfileController {
             next(error);
         }
     }
+
+    static async getAllProfile(req, res, next) {
+        try {
+            const profiles = await Profile.findAll({
+                order: [
+                    ['mmr', 'DESC'],
+                ],
+            })
+            res.status(200).json(profiles)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = ProfileController

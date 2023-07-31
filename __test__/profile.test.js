@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require("../app");
+const {server} = require("../app");
 const { sequelize, User } = require('../models');
 const { queryInterface } = sequelize
 const { signToken } = require('../helpers/jwt');
@@ -36,7 +36,7 @@ describe('POST /profiles', () => {
             role: "Student",
             UserId: 1
         };
-        const response = await request(app).post('/profiles').send(profile).set('access_token', token);
+        const response = await request(server).post('/profiles').send(profile).set('access_token', token);
         expect(response.status).toBe(201);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("firstName", profile.firstName);
@@ -51,14 +51,14 @@ describe('POST /profiles', () => {
             role: "Student",
             UserId: 1
         };
-        const response = await request(app).post('/profiles').send(profile).set('access_token', invalidToken);
+        const response = await request(server).post('/profiles').send(profile).set('access_token', invalidToken);
         expect(response.status).toBe(401);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "Invalid email/password");
     });
 
     it('get profile users', async () => {
-        const response = await request(app).get('/profiles').set('access_token', token);
+        const response = await request(server).get('/profiles').set('access_token', token);
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
     });
@@ -70,7 +70,7 @@ describe("PATCH /profiles", () => {
     }
 
     it("should update mmr profile if input is '+20' and return 200", async () => {
-        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", token);
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "MMR updated");
@@ -78,7 +78,7 @@ describe("PATCH /profiles", () => {
 
     it("should update mmr profile if input is '-10' and return 200", async () => {
         body.input = "-10";
-        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", token);
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "MMR updated");
@@ -86,7 +86,7 @@ describe("PATCH /profiles", () => {
 
     it("should update mmr profile if input is '-20' and return 200", async () => {
         body.input = "-20";
-        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", token);
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "MMR updated");
@@ -94,7 +94,7 @@ describe("PATCH /profiles", () => {
 
     it("should failed if input is empty and return 401", async () => {
         body.input = "";
-        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", token);
         expect(response.status).toBe(401);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "Invalid input");
@@ -102,7 +102,7 @@ describe("PATCH /profiles", () => {
 
     it("should failed if input is null and return 401", async () => {
         delete body.input;
-        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", token);
         expect(response.status).toBe(401);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "Invalid input");
@@ -110,7 +110,7 @@ describe("PATCH /profiles", () => {
 
     it("should failed if input is wrong input and return 401", async () => {
         body.input = "wrong input";
-        const response = await request(app).patch("/profiles").send(body).set("access_token", token);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", token);
         expect(response.status).toBe(401);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "Invalid input");
@@ -118,7 +118,7 @@ describe("PATCH /profiles", () => {
 
     it("should failed if input is wrong input and return 401", async () => {
         body.input = "wrong input";
-        const response = await request(app).patch("/profiles").send(body).set("access_token", invalidToken);
+        const response = await request(server).patch("/profiles").send(body).set("access_token", invalidToken);
         expect(response.status).toBe(401);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "Invalid email/password");

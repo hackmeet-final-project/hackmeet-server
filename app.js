@@ -66,8 +66,4 @@ io.on("connection", (socket) => {
     })
 })
 
-// server.listen(PORT, () => {
-//     console.log(`listening on ${PORT}`)
-// })
-
-module.exports = server
+module.exports = {server, io}

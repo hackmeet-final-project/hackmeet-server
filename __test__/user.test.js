@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../app");
+const {server} = require("../app");
 const { hashPassword } = require("../helpers/bcrypt");
 const { sequelize } = require("../models");
 
@@ -34,7 +34,7 @@ describe("POST /users", () => {
       email: "hay@mail.com",
       password: "12345",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(201);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("email", cust.email);
@@ -46,7 +46,7 @@ describe("POST /users", () => {
       email: "hay@mail.com",
       password: "",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Password is required");
@@ -57,7 +57,7 @@ describe("POST /users", () => {
       email: "",
       password: "12345",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Email is required");
@@ -69,7 +69,7 @@ describe("POST /users", () => {
       email: "hayyyy",
       password: "12345",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Invalid email format");
@@ -79,7 +79,7 @@ describe("POST /users", () => {
     const cust = {
       email: "hay@mail.com",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Password is required");
@@ -89,7 +89,7 @@ describe("POST /users", () => {
     const cust = {
       password: "12345",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Email is required");
@@ -100,7 +100,7 @@ describe("POST /users", () => {
       email: "hay@mail.com",
       password: "12345",
     };
-    const response = await request(app).post("/users").send(cust);
+    const response = await request(server).post("/users").send(cust);
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Email already registered");
@@ -113,7 +113,7 @@ describe("POST /cust/login", () => {
       email: "hay@mail.com",
       password: "12345",
     };
-    const response = await request(app).post("/users/login").send(cust);
+    const response = await request(server).post("/users/login").send(cust);
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("access_token", expect.any(String));
@@ -124,7 +124,7 @@ describe("POST /cust/login", () => {
       email: "hay@mail.com",
       password: "123456",
     };
-    const response = await request(app).post("/users/login").send(cust);
+    const response = await request(server).post("/users/login").send(cust);
     expect(response.status).toBe(401);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Invalid email/password");
@@ -135,7 +135,7 @@ describe("POST /cust/login", () => {
       email: "hayyy123@mail.com",
       password: "12345",
     };
-    const response = await request(app).post("/users/login").send(cust);
+    const response = await request(server).post("/users/login").send(cust);
     expect(response.status).toBe(401);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Invalid email/password");

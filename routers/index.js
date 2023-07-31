@@ -36,8 +36,9 @@ router.post("/profiles", ProfileController.createProfile);
 router.get("/profiles", ProfileController.getUserProfile);
 router.get("/profiles/all", ProfileController.getAllProfile);
 router.patch("/profiles", ProfileController.patchMmr);
+router.get("/profiles/all", ProfileController.getAllProfile);
 
-// Question Roiter
+// Question Router
 router.get("/questions", QuestionController.getAll);
 
 module.exports = router;

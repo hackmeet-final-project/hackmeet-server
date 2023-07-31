@@ -23,6 +23,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1",
     "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1",
     "supertest": "^6.3.3"
   },
   "devDependencies": {
