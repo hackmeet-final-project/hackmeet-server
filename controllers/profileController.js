@@ -25,6 +25,19 @@ class ProfileController {
         }
     }
 
+    static async getAllProfile(req, res, next) {
+        try {
+            const profiles = await Profile.findAll({
+                order: [
+                    ['mmr', 'DESC'],
+                ],
+            })
+            res.status(200).json(profiles)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     static async patchMmr(req, res, next) {
         try {
             const { id: UserId } = req.user;

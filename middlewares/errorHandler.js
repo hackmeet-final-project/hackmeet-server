@@ -1,9 +1,8 @@
 const errorHandler = (error, req, res, next) => {
-    console.log(error)
     let message = 'Internal server error'
     let status = 500
     let name = error.name
-
+    console.log(error)
     switch(name) {
         case "BADREQUEST":
             status = 401
@@ -21,7 +20,6 @@ const errorHandler = (error, req, res, next) => {
             message = "Invalid email/password"
             break
     }
-
     res.status(status).json({message})
 }
 

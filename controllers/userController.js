@@ -20,14 +20,14 @@ class UserController {
     const { email, password } = req.body;
     try {
       if (!email) {
-        throw { name: "BADREQUEST", message: "Email is required" };
+        throw { name: "BADREQUEST", message: "Email is required" }
       }
       if (!password) {
-        throw { name: "BADREQUEST", message: "Password is required" };
+        throw { name: "BADREQUEST", message: "Password is required" }
       }
       let user = await User.findOne({
         where: {
-          email,
+          email
         },
       });
       if (!user || !comparePassword(password, user.password)) {

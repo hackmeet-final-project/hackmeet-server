@@ -23,9 +23,9 @@ router.use(async (req, res, next) => {
     if (!user) {
       throw { name: "INVALIDTOKEN" };
     }
-    req.user = {
-      id: payload.id,
-    };
+    
+    req.user = { id: payload.id};
+
     next();
   } catch (error) {
     next(error);
@@ -34,6 +34,7 @@ router.use(async (req, res, next) => {
 
 router.post("/profiles", ProfileController.createProfile);
 router.get("/profiles", ProfileController.getUserProfile);
+router.get("/profiles/all", ProfileController.getAllProfile);
 router.patch("/profiles", ProfileController.patchMmr);
 
 // Question Roiter
