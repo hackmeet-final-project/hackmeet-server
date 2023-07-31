@@ -4,6 +4,7 @@ const redis = require('./config/redis')
 const router = require('./routers/index')
 const errorHandler = require('./middlewares/errorHandler')
 const { Room } = require('./models')
+const { Op } = require('sequelize')
 const app = express()
 const server = require('http').Server(app)
 const PORT = process.argv.PORT || 3000
@@ -44,7 +45,7 @@ io.on("connection", (socket) => {
                 })
                 socket.join(room.dataValues.name)
             }
-            console.log(`user ${username} join ke room`, room.dataValues.name)
+            console.log("USER", username, "masuk ke room", room.dataValues)
      
             socket.nsp.to(room.dataValues.name).emit("assign-room", room.dataValues.name)
     
@@ -55,19 +56,56 @@ io.on("connection", (socket) => {
             console.log(error)
         }
     })
-
-    socket.on("start-timer", room => {
-        console.log(`timer jalan di room`, room)
-        socket.nsp.to(room).emit("timer-ready")
+    socket.on("players-ready", async(peerId) => {
+        const room = await Room.findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        owner: peerId
+                    },
+                    {
+                        guest: peerId
+                    }
+                ]
+            }
+        })
+        socket.nsp.to(room.dataValues.name).emit("set-ready")
     })
 
     socket.on("send-message", (message, room) => {
         socket.to(room).emit("receive-message", message)
     })
+
+    socket.on("user-leave-room", async(peerId) => {
+        try {
+            const deletedRoom = await Room.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            owner: peerId
+                        },
+                        {
+                            guest: peerId
+                        }
+                    ]
+                }
+            })
+            console.log("room yang ke delete : \n", deletedRoom.dataValues)
+            if(deletedRoom) {
+                socket.nsp.to(deletedRoom.dataValues.name).emit("room-deleted")
+                await deletedRoom.destroy()
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    })
+    socket.on("disconnect", (reason) => {
+        console.log(socket.id)
+    })
 })
 
-// server.listen(PORT, () => {
-//     console.log(`listening on ${PORT}`)
-// })
+server.listen(PORT, () => {
+    console.log(`listening on ${PORT}`)
+})
 
-module.exports = server
+// module.exports = server
