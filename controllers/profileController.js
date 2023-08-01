@@ -6,7 +6,7 @@ class ProfileController {
         try {
             const { firstName, lastName, hacktivId, role } = req.body
             if (!firstName) {
-                throw { name: "BADREQPROFILE", message: "First name is required!" }
+                throw { name: "BADREQUEST", message: "First name is required!" }
             }
             const newProfile = await Profile.create({ firstName, lastName, hacktivId, role, UserId: id })
             res.status(201).json(newProfile)
