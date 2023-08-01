@@ -76,9 +76,17 @@ io.on("connection", (socket) => {
         socket.to(room).emit("receive-message", message)
     })
 
+    socket.on("draw", (room) => {
+        socket.nsp.to(room).emit("draw-result")
+    })
+
+    socket.on("winner", (room, peerId) => {
+        socket.nsp.to(room).emit("winner-result", peerId)
+    })
+
     socket.on("user-leave-room", async(peerId) => {
         try {
-            const deletedRoom = await Room.findOne({
+            const room = await Room.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -90,17 +98,17 @@ io.on("connection", (socket) => {
                     ]
                 }
             })
-            console.log("room yang ke delete : \n", deletedRoom.dataValues)
-            if(deletedRoom) {
-                socket.nsp.to(deletedRoom.dataValues.name).emit("room-deleted")
-                await deletedRoom.destroy()
+            console.log("room yang ke delete : \n", room.dataValues)
+            if(room) {
+                socket.nsp.to(room.dataValues.name).emit("room-deleted")
+                await room.destroy()
             }
         } catch (error) {
             console.log(error)
         }
     })
-    socket.on("disconnect", (reason) => {
-        console.log(socket.id)
+    socket.on("disconnect", () => {
+        console.log(socket.id, "has disconnected")
     })
 })
 
