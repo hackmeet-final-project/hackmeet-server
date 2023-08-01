@@ -22,7 +22,7 @@ const io = require('socket.io')(server, {
 })
 
 io.on("connection", (socket) => {
-  console.log(`user login`, socket.id)
+  // console.log(`user login`, socket.id)
   socket.on("join-room", async (username, peerId) => {
     try {
       let room = await Room.findOne({
@@ -44,7 +44,7 @@ io.on("connection", (socket) => {
           })
         socket.join(room.dataValues.name)
       }
-      console.log("USER", username, "masuk ke room", room.dataValues)
+      // console.log("USER", username, "masuk ke room", room.dataValues)
 
       socket.nsp.to(room.dataValues.name).emit("assign-room", room.dataValues.name)
 
@@ -97,7 +97,7 @@ io.on("connection", (socket) => {
           ]
         }
       })
-      console.log("room yang ke delete : \n", room.dataValues)
+      // console.log("room yang ke delete : \n", room.dataValues)
       if (room) {
         socket.nsp.to(room.dataValues.name).emit("room-deleted")
         await room.destroy()
@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
     }
   })
   socket.on("disconnect", () => {
-    console.log(socket.id, "has disconnected")
+    // console.log(socket.id, "has disconnected")
   })
 })
 
