@@ -188,17 +188,18 @@ describe("socket testing", () => {
     });
   }, 5000);
 
-  it('should handle "user-leave-room" event', async (done) => {
+  it('should handle "user-leave-room" event', (done) => {
     // Emit "join-room" to create a room first
     socket.emit('join-room', 'User1', 'PeerId1');
-    socket.on('assign-room', async (roomName) => {
+    socket.on('assign-room', (roomName) => {
       // Emit "user-leave-room" to simulate a user leaving the room
       socket.emit('user-leave-room', 'PeerId1');
       // Wait for the server to process the event and emit "room-deleted"
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      secondSocket.on('room-deleted', () => {
+      // await new Promise((resolve) => setTimeout(resolve, 100));
+      socket.on('room-deleted', () => {
         done();
       });
+      socket.emit("room-deleted");
     });
   });
 

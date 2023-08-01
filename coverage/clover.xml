@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1690903150928" clover="3.2.0">
-  <project timestamp="1690903150928" name="All files">
+<coverage generated="1690912209295" clover="3.2.0">
+  <project timestamp="1690912209295" name="All files">
     <metrics statements="208" coveredstatements="198" conditionals="42" coveredconditionals="38" methods="36" coveredmethods="33" elements="286" coveredelements="269" complexity="0" loc="208" ncloc="208" packages="6" files="15" classes="15"/>
     <package name="hackmeet-server">
       <metrics statements="46" coveredstatements="40" conditionals="8" coveredconditionals="7" methods="8" coveredmethods="5"/>
@@ -26,13 +26,13 @@
         <line num="27" count="9" type="stmt"/>
         <line num="28" count="9" type="stmt"/>
         <line num="33" count="9" type="cond" truecount="2" falsecount="0"/>
-        <line num="34" count="5" type="stmt"/>
-        <line num="38" count="5" type="stmt"/>
-        <line num="40" count="4" type="stmt"/>
-        <line num="45" count="4" type="stmt"/>
+        <line num="34" count="2" type="stmt"/>
+        <line num="38" count="2" type="stmt"/>
+        <line num="40" count="7" type="stmt"/>
+        <line num="45" count="7" type="stmt"/>
         <line num="49" count="9" type="stmt"/>
         <line num="51" count="9" type="cond" truecount="2" falsecount="0"/>
-        <line num="52" count="2" type="stmt"/>
+        <line num="52" count="5" type="stmt"/>
         <line num="55" count="0" type="stmt"/>
         <line num="58" count="9" type="stmt"/>
         <line num="59" count="0" type="stmt"/>
