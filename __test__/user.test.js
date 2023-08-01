@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../app");
+const { server: app } = require("../app");
 const { hashPassword } = require("../helpers/bcrypt");
 const { sequelize } = require("../models");
 
@@ -97,7 +97,7 @@ describe("POST /users", () => {
 
   it("email is not unique and return 400", async () => {
     const cust = {
-      email: "hay@mail.com",
+      email: "cust1@mail.com",
       password: "12345",
     };
     const response = await request(app).post("/users").send(cust);
@@ -107,7 +107,7 @@ describe("POST /users", () => {
   });
 });
 
-describe("POST /cust/login", () => {
+describe("POST /users/login", () => {
   it("customer login and return 200", async () => {
     const cust = {
       email: "hay@mail.com",
@@ -139,5 +139,27 @@ describe("POST /cust/login", () => {
     expect(response.status).toBe(401);
     expect(response.body).toBeInstanceOf(Object);
     expect(response.body).toHaveProperty("message", "Invalid email/password");
+  });
+
+  it("should failed if email is empty or null and return 401", async () => {
+    const cust = {
+      email: "",
+      password: "12345",
+    };
+    const response = await request(app).post("/users/login").send(cust);
+    expect(response.status).toBe(401);
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body).toHaveProperty("message", "Email is required");
+  });
+
+  it("should failed if password is empty or null and return 401", async () => {
+    const cust = {
+      email: "cust1@mail.com",
+      password: "",
+    };
+    const response = await request(app).post("/users/login").send(cust);
+    expect(response.status).toBe(401);
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body).toHaveProperty("message", "Password is required");
   });
 });

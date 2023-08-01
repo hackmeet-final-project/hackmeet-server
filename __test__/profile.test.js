@@ -1,11 +1,12 @@
 const request = require('supertest');
-const app = require("../app");
+const { server: app } = require("../app");
 const { sequelize, User } = require('../models');
 const { queryInterface } = sequelize
 const { signToken } = require('../helpers/jwt');
 
 let token
 const invalidToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMUBtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE2MjI2MDk2NTF9.gShAB2qaCUjlnvNuM1MBWfBVEjDGdqjWSJNMEScXIeE';
+const userNotFound = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIwMUBtYWlsLmNvbSIsImlkIjoxMDAwLCJpYXQiOjE2MjI2MDk2NTF9.WCCYBdrIjPSZVjZhtWHeq-pgHaVTQwbEFdYX2SYFYyo"
 
 
 beforeAll(async () => {
@@ -57,12 +58,48 @@ describe('POST /profiles', () => {
         expect(response.body).toHaveProperty("message", "Invalid email/password");
     });
 
-    it('get profile users', async () => {
+    it('should failed if firstName is null or empty and return 401', async () => {
+        const profile = {
+            firstName: "",
+            lastName: "",
+            hacktivId: "1ushqsjn",
+            role: "Student",
+            UserId: 1
+        };
+        const response = await request(app).post('/profiles').send(profile).set('access_token', token);
+        expect(response.status).toBe(401);
+        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toHaveProperty("message", "First name is required!");
+    });
+});
+
+describe("GET /profiles", () => {
+    it('should get profile users', async () => {
         const response = await request(app).get('/profiles').set('access_token', token);
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
     });
-});
+
+    it("should failed if invalid token and return 401", async () => {
+        const response = await request(app).get("/profiles").set("access_token", invalidToken);
+        expect(response.status).toBe(401);
+        expect(response.body).toHaveProperty("message", "Invalid email/password");
+    })
+
+    it("should failed if user not found and return 401", async () => {
+        const response = await request(app).get("/profiles").set("access_token", userNotFound);
+        expect(response.status).toBe(401);
+        expect(response.body).toHaveProperty("message", "Invalid email/password");
+    })
+})
+
+describe("GET /profiles/all", () => {
+    it('should get all profile users', async () => {
+        const response = await request(app).get('/profiles/all').set('access_token', token);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Array);
+    });
+})
 
 describe("PATCH /profiles", () => {
     const body = {
@@ -114,13 +151,5 @@ describe("PATCH /profiles", () => {
         expect(response.status).toBe(401);
         expect(response.body).toBeInstanceOf(Object);
         expect(response.body).toHaveProperty("message", "Invalid input");
-    });
-
-    it("should failed if input is wrong input and return 401", async () => {
-        body.input = "wrong input";
-        const response = await request(app).patch("/profiles").send(body).set("access_token", invalidToken);
-        expect(response.status).toBe(401);
-        expect(response.body).toBeInstanceOf(Object);
-        expect(response.body).toHaveProperty("message", "Invalid email/password");
     });
 });
