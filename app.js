@@ -1,6 +1,5 @@
 const cors = require('cors')
 const express = require('express')
-const redis = require('./config/redis')
 const router = require('./routers/index')
 const errorHandler = require('./middlewares/errorHandler')
 const { Room } = require('./models')
@@ -56,24 +55,16 @@ io.on("connection", (socket) => {
             console.log(error)
         }
     })
-    socket.on("players-ready", async(peerId) => {
-        const room = await Room.findOne({
-            where: {
-                [Op.or]: [
-                    {
-                        owner: peerId
-                    },
-                    {
-                        guest: peerId
-                    }
-                ]
-            }
-        })
-        socket.nsp.to(room.dataValues.name).emit("set-ready")
+    socket.on("players-ready", (room) => {
+        socket.nsp.to(room).emit("set-ready")
     })
 
     socket.on("send-message", (message, room) => {
         socket.to(room).emit("receive-message", message)
+    })
+
+    socket.on("send-shake", (room, shake) => {
+        socket.to(room).emit("receive-shake", shake)
     })
 
     socket.on("draw", (room) => {
