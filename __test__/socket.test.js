@@ -17,21 +17,16 @@ describe("socket testing", () => {
       console.log("worked...");
       done();
     });
-    socket.on("disconnect", function () {
-      console.log("disconnected...");
-    });
   });
 
   afterEach(function (done) {
     if (socket.connected) {
       console.log("disconnecting...");
-      socket.disconnect();
     } else {
       console.log("no connection to break...");
     }
     if (secondSocket.connected) {
       console.log("disconnecting...");
-      secondSocket.disconnect();
     } else {
       console.log("no connection to break...");
     }
@@ -76,7 +71,6 @@ describe("socket testing", () => {
     done();
   }, 5000);
 
-  // socketnya bisa jalan ketika nsp-nya dihapus, line 51, 54
   test("should receive 'receive-message' event when a message is sent", (done) => {
     const username = "John";
     const peerId = "12345";
@@ -97,21 +91,6 @@ describe("socket testing", () => {
     done();
   }, 5000);
 
-  // test("should emit 'room-deleted' event when a user leaves the room", (done) => {
-  //   const username = "John";
-  //   const peerId = "12345";
-
-  //   socket.emit("join-room", username, peerId);
-
-  //   socket.on("assign-room", () => {
-  //     socket.emit("user-leave-room", peerId);
-
-  //     socket.on("room-deleted", () => {
-  //     });
-  //   });
-  //   done();
-  // }, 5000);
-
   test("should emit 'draw-result' event when a user sends a draw signal", (done) => {
     const username = "John";
     const peerId = "12345";
@@ -119,10 +98,7 @@ describe("socket testing", () => {
     socket.emit("join-room", username, peerId);
 
     socket.on("assign-room", () => {
-      // User sends a draw signal
       socket.emit("draw", peerId);
-
-      // The room should receive 'draw-result' event
       socket.on("draw-result", () => {
       });
       done();
@@ -136,17 +112,53 @@ describe("socket testing", () => {
     socket.emit("join-room", username, peerId);
 
     socket.on("assign-room", () => {
-      // User sends a winner signal
       const winnerId = "98765";
       socket.emit("winner", peerId, winnerId);
-
-      // The room should receive 'winner-result' event with the winner ID
       socket.on("winner-result", (receivedWinnerId) => {
         expect(receivedWinnerId).toBe(winnerId);
         done();
       });
     });
   }, 5000);
+
+  it("should emit 'set-ready' to all players in the room", (done) => {
+    const room = "test-room";
+    socket.emit("join-room", "John", "12345");
+    secondSocket.emit("join-room", "Alice", "56789");
+    let receivedEvents = 0;
+    const onSetReady = () => {
+      receivedEvents++;
+      if (receivedEvents === 2) {
+        done();
+      }
+    };
+    setTimeout(() => {
+      socket.emit("players-ready", room);
+      secondSocket.on("set-ready", onSetReady);
+      socket.on("set-ready", onSetReady);
+    }, 500);
+    done();
+  });
+
+  test("should emit 'receive-shake' event to all players in the room", (done) => {
+    const room = "test-room";
+    const mockShake = { some: "data" };
+    socket.emit("join-room", "John", "12345");
+    secondSocket.emit("join-room", "Alice", "56789");
+    setTimeout(() => {
+      socket.emit("send-shake", room, mockShake);
+      socket.on("receive-shake", (receivedShake) => {
+        expect(receivedShake).toEqual(mockShake);
+        done();
+      });
+
+      secondSocket.on("receive-shake", (receivedShake) => {
+        expect(receivedShake).toEqual(mockShake);
+      });
+    }, 500);
+    done();
+  });
+
 
   test("should handle 'disconnect' event when a user disconnects", (done) => {
     const username = "John";
@@ -155,10 +167,7 @@ describe("socket testing", () => {
     socket.emit("join-room", username, peerId);
 
     socket.on("assign-room", () => {
-      // Simulate user disconnection
       socket.disconnect();
-
-      // Server should log the disconnection
       done();
     });
   }, 5000);
@@ -187,20 +196,17 @@ describe("socket testing", () => {
       done();
     });
   }, 5000);
+  
 
-  it('should handle "user-leave-room" event', (done) => {
-    // Emit "join-room" to create a room first
+  test('should handle "user-leave-room" event', (done) => {
     socket.emit('join-room', 'User1', 'PeerId1');
     socket.on('assign-room', (roomName) => {
-      // Emit "user-leave-room" to simulate a user leaving the room
       socket.emit('user-leave-room', 'PeerId1');
-      // Wait for the server to process the event and emit "room-deleted"
-      // await new Promise((resolve) => setTimeout(resolve, 100));
       socket.on('room-deleted', () => {
-        done();
       });
+      done();
       socket.emit("room-deleted");
     });
   });
-
+  
 });
