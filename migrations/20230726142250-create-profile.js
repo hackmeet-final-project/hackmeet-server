@@ -22,8 +22,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       mmr: {
-        type: Sequelize.INTEGER,
-        defaultValue: 1000
+        type: Sequelize.INTEGER
       },
       UserId: {
         type: Sequelize.INTEGER
